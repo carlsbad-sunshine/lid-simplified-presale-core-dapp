@@ -1,0 +1,9 @@
+body {
+  font-family: Gotham, sans-serif;
+  font-weight: '500';
+  font-size: '18px';
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: white;
+  color: #040404;
+}
