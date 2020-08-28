@@ -48,6 +48,7 @@ function App() {
 
   const [state, setState] = useState({
     startTime: Date.UTC(2020, 7, 27, 4, 0, 0, 0),
+    accessTime: Date.UTC(2020, 7, 27, 4, 0, 0, 0),
     endTime: null,
     totalEth: '0',
     totalDepositors: '0',
@@ -68,6 +69,7 @@ function App() {
 
   const {
     startTime,
+    accessTime,
     endTime,
     totalEth,
     totalDepositors,
@@ -111,6 +113,11 @@ function App() {
         {
           call: ['getEthBalance(address)(uint256)', addresses.presale],
           returns: [['totalEth', (val) => val.toString()]]
+        },
+        {
+          target: addresses.timer,
+          call: ['startTime()(uint256)'],
+          returns: [['startTime', (val) => val.toNumber()]]
         },
         {
           target: addresses.redeemer,
@@ -171,6 +178,11 @@ function App() {
 
     walletWatcher.recreate(
       [
+        {
+          target: addresses.access,
+          call: ['getAccessTime(address,uint256)(uint256)', address, startTime],
+          returns: [['accessTime', (val) => val.toNumber()]]
+        },
         {
           target: addresses.redeemer,
           call: ['accountShares(address)(uint256)', address],
@@ -234,7 +246,7 @@ function App() {
     });
 
     walletWatcher.start();
-  }, [web3, address, finalEndTime, totalEth, hardcap]);
+  }, [web3, address, finalEndTime, totalEth, startTime, hardcap]);
 
   const handleDeposit = async function () {
     if (!depositVal) {
@@ -320,15 +332,15 @@ function App() {
 
   useEffect(() => {
     setIsActive(true);
-    if (Date.now() < startTime) {
+    if (Date.now() < accessTime) {
       let interval = setInterval(() => {
-        setIsActive(Date.now() > startTime);
+        setIsActive(Date.now() > accessTime);
       }, 500);
       return () => clearInterval(interval);
     } else {
       setIsActive(true);
     }
-  }, [startTime]);
+  }, [accessTime]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -398,15 +410,13 @@ function App() {
         ml="auto"
         mr="auto"
       />
-      {isActive &&
-        isEnded &&
-        !isPaused && (
-          <PresaleCompletion
-            isEnded={isEnded}
-            handleSendToUniswap={handleSendToUniswap}
-            handleIssueTokens={handleIssueTokens}
-          />
-        )}
+      {isActive && isEnded && !isPaused && (
+        <PresaleCompletion
+          isEnded={isEnded}
+          handleSendToUniswap={handleSendToUniswap}
+          handleIssueTokens={handleIssueTokens}
+        />
+      )}
 
       <Footer />
     </ThemeProvider>
