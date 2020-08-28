@@ -9,7 +9,8 @@ export default function Subheading({
   totalDepositors,
   accountEthDeposit,
   accountShares,
-  maxShares
+  maxShares,
+  stakingLid
 }) {
   return (
     <Box
@@ -68,9 +69,7 @@ export default function Subheading({
                 {addresses.presale}
               </Link>
             ) : (
-              <Text>
-                TBD
-              </Text>
+              <Text>TBD</Text>
             )}
           </Box>
           <Box
@@ -197,6 +196,30 @@ export default function Subheading({
             </Text>
             <Text fontSize="38px" w="100%" fontWeight="bold" color="lid.brand">
               {shortEther(toWei(totalPresale))}
+            </Text>
+          </Box>
+          <Box
+            w="100%"
+            border="solid 1px"
+            borderColor="lid.stroke"
+            color="lid.fg"
+            borderRadius="5px"
+            p="25px"
+            bg="lid.bg">
+            <Image
+              src="/logo-lid.png"
+              alt="Lid Website"
+              w="auto"
+              h="25px"
+              display="inline-block"
+              position="relative"
+              top="-3px"
+            />
+            <Text ml="10px" mt="5px" color="lid.fgMed" display="inline-block">
+              Your Staking Lid Tokens
+            </Text>
+            <Text fontSize="38px" w="100%" fontWeight="bold" color="lid.brand">
+              {shortEther(stakingLid)}
             </Text>
           </Box>
         </Grid>

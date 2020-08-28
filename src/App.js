@@ -47,8 +47,8 @@ function App() {
   const [depositVal, setDepositVal] = useState('');
 
   const [state, setState] = useState({
-    startTime: Date.UTC(2020, 7, 27, 4, 0, 0, 0),
-    accessTime: Date.UTC(2020, 7, 27, 4, 0, 0, 0),
+    startTime: Date.UTC(2020, 7, 29, 4, 0, 0, 0),
+    accessTime: Date.UTC(2020, 7, 29, 4, 0, 0, 0),
     endTime: null,
     totalEth: '0',
     totalDepositors: '0',
@@ -63,6 +63,7 @@ function App() {
     accountClaimedTokens: '0',
     maxShares: '0',
     hardcap: '0',
+    stakingLid: '0',
     isEnded: false,
     isPaused: false
   });
@@ -84,6 +85,7 @@ function App() {
     accountClaimedTokens,
     maxShares,
     hardcap,
+    stakingLid,
     isEnded,
     isPaused
   } = state;
@@ -117,7 +119,7 @@ function App() {
         {
           target: addresses.timer,
           call: ['startTime()(uint256)'],
-          returns: [['startTime', (val) => val.toNumber()]]
+          returns: [['startTime', (val) => val.toNumber() * 1000]]
         },
         {
           target: addresses.redeemer,
@@ -142,7 +144,7 @@ function App() {
         {
           target: addresses.timer,
           call: ['endTime()(uint256)'],
-          returns: [['endTime', (val) => new Date(val * 1000)]]
+          returns: [['endTime', (val) => val.toNumber() * 1000]]
         },
         {
           target: addresses.presale,
@@ -180,8 +182,17 @@ function App() {
       [
         {
           target: addresses.access,
-          call: ['getAccessTime(address,uint256)(uint256)', address, startTime],
-          returns: [['accessTime', (val) => val.toNumber()]]
+          call: [
+            'getAccessTime(address,uint256)(uint256)',
+            address,
+            startTime / 1000
+          ],
+          returns: [['accessTime', (val) => val.toNumber() * 1000]]
+        },
+        {
+          target: addresses.staking,
+          call: ['stakeValue(address)(uint256)', address],
+          returns: [['stakingLid', (val) => val.toString()]]
         },
         {
           target: addresses.redeemer,
@@ -352,6 +363,7 @@ function App() {
         accountEthDeposit={accountEthDeposit}
         accountShares={accountShares}
         maxShares={maxShares}
+        stakingLid={stakingLid}
       />
       {isPaused && (
         <>
@@ -393,7 +405,7 @@ function App() {
         </>
       )}
       {!isActive && !isEnded && !isPaused && (
-        <StartTimer expiryTimestamp={startTime} />
+        <StartTimer expiryTimestamp={accessTime} />
       )}
       <ReferralCode
         address={address}
